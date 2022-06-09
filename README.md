@@ -198,12 +198,7 @@ dsm_rgba_img = Image.fromarray(dsm_rgba_matrix)
 dsm_rgba_img.save(COLORIZED_DSM_PATH, save_all=True, tiffinfo=orthomosaic_img.tag_v2) # 정사영상(orthomosaic_img)의 메타데이터 복사
 
 generate_tiles(COLORIZED_DSM_PATH,TILE_PATH, zoom=[0,20])
-```
-Generating Base Tiles:  
-0...10...20...30...40...50...60...70...80...90...100  
-Generating Overview Tiles:  
-0...10...20...30...40...50...60...70...80...90...100  
-
+```  
 #### [타일화 결과 보기](output/tiles)
 
 최종 처리 결과입니다.\
