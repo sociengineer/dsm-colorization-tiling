@@ -137,8 +137,6 @@ np.prod(dsm_img.size) # 처리해야 할 픽셀 갯수 (1억 6930만 7930)
 ***정사영상***
 
 ```python
-import matplotlib.pyplot as plt
-
 plt.figure(figsize=(8,8))
 _=plt.imshow(orthomosaic_img)
 ```   
