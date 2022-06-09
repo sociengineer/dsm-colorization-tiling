@@ -1,34 +1,11 @@
----
-jupyter:
-  interpreter:
-    hash: 9d276f7b111bccd40cc916608043162d5f91c9ef88ea921f74a00025f559aca7
-  kernelspec:
-    display_name: "Python 3.9.12 (\\'env\\': venv)"
-    language: python
-    name: python3
-  language_info:
-    codemirror_mode:
-      name: ipython
-      version: 3
-    file_extension: .py
-    mimetype: text/x-python
-    name: python
-    nbconvert_exporter: python
-    pygments_lexer: ipython3
-    version: 3.9.12
-  nbformat: 4
-  nbformat_minor: 2
-  orig_nbformat: 4
----
-
 ## 용어 정의
 
 -   DSM : digital surface model의 약자이며 tiff 포멧의 이미지
     파일입니다.
-    -   Pixel 구성요소 : 높이 값 (float type Z value)\
-    -   Shape : 2차원 (x,y)\
+    -   Pixel 구성요소 : 높이 값 (float type Z value)  
+    -   Shape : 2차원 (x,y)  
 -   정사영상(orthomosaic) : 현장 사진이며 tiff 포멧의 이미지 파일입니다.
-    -   Pixel 구성요소 : 4개의 색상채널 Matrix \[ R , G , B , A \]\
+    -   Pixel 구성요소 : 4개의 색상채널 Matrix [ R , G , B , A \]  
     -   shape : 3차원 (x,y,4)
 
 > 드론이 하늘에서 찍은 사진들을 Stitching 해서 Geotiff 태그(지리정보)를
@@ -44,7 +21,6 @@ jupyter:
 
 > Min-Max Normalization 연산을 위해서 분포는 유지하되, 음수가 없도록
 > 하는 트릭입니다.
-:::
 
 ## Colormap
 
@@ -79,21 +55,21 @@ ORTHOMOSAIC:bytes = open("input/sample_orthomosaic.tif","rb").read()
 
 `rgba_matrix = Surface2Color(dsm_matrix).transform()`
 
--   컬러맵은 256개의 요소로 이루어진 리스트입니다. 0\~255 인덱스로
-    접근하며, 인덱스가 255에 가까울수록 높은 Z값을 표현해줍니다.\
+-   컬러맵은 256개의 요소로 이루어진 리스트입니다. 0~255 인덱스로
+    접근하며, 인덱스가 255에 가까울수록 높은 Z값을 표현해줍니다.  
 
 1.  DSM의 픽셀(Z값)에 곱하면 컬러맵 인덱스가 나오게 해주는 미지수 n을
-    구합니다. -\> DSM_pixel x n = colormap_index
+    구합니다. -> DSM_pixel x n = colormap_index  
 2.  모든 픽셀에 대해서 Z값(DSM 픽셀)을 RGBA채널로 변환시키는 연산을
-    수행합니다.
-    -   `if z == 결측치: return (0,0,0,0) else: return colormap[ round(z x n) ]`\
-    -   수 억 번의 연산을 2\~3분 안에 처리하는 방법 - 연산 병렬화(
+    수행합니다.  
+    -   `if z == 결측치: return (0,0,0,0) else: return colormap[ round(z x n) ]`  
+    -   수 억 번의 연산을 2~3분 안에 처리하는 방법 - 연산 병렬화(
         [pandarallel](https://towardsdatascience.com/pandaral-lel-a-simple-and-efficient-tool-to-parallelize-your-pandas-operations-on-all-your-cpus-bb5ff2a409ae)
-        사용 )
-        1.  pd.DataFrame(dsm_matrix).parallel_applymap\
-        2.  DataFrame -\> 3D array 변환 (flatten & reshape)\
+        사용 )  
+        1.  pd.DataFrame(dsm_matrix).parallel_applymap  
+        2.  DataFrame -> 3D array 변환 (flatten & reshape)  
     -   여기에서 사용하는 셈플은 1억 6930만 7930개의 픽셀로 이루어져
-        있습니다.
+        있습니다.  
 
 ```python
 from typing import Iterable
@@ -163,7 +139,6 @@ orthomosaic_img = Image.open(io.BytesIO(ORTHOMOSAIC))
 
 np.prod(dsm_img.size) # 처리해야 할 픽셀 갯수 (1억 6930만 7930)
 ```
-
 169307930  
 
 
