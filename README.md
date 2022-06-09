@@ -51,7 +51,7 @@ ORTHOMOSAIC:bytes = open("input/sample_orthomosaic.tif","rb").read()
 
 * 컬러맵은 256개의 요소로 이루어진 리스트입니다. 0~255 인덱스로 접근하며, 인덱스가 255에 가까울수록 높은 Z값을 표현해줍니다. 
 * 모든 픽셀에 대해서 Z값(DSM 픽셀)을 RGBA채널로 변환시키는 연산을 수행합니다.  
-    * ```if z == 결측치: return (0,0,0,0) else: return colormap[ round(z x n) ]```   
+    * ```if z == 결측치: return (0,0,0,0) else: return colormap[ round( (z+offset) x n ) ]```   
     * 수 억 번의 연산을 2~3분 안에 처리하는 방법 - 연산 병렬화( [pandarallel](https://towardsdatascience.com/pandaral-lel-a-simple-and-efficient-tool-to-parallelize-your-pandas-operations-on-all-your-cpus-bb5ff2a409ae) 사용 )  
         1. pd.DataFrame(dsm_matrix).parallel_applymap  
         2. DataFrame -> 3D array 변환 (flatten & reshape)  
