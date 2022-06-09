@@ -14,15 +14,7 @@
 > 입힌것이 정사영상입니다.\
 > DSM은 이 정사영상의 각 픽셀들에 대한 높이(Z)값을 담은 파일입니다.\
 > 두 파일은 픽셀 구성요소와 매트릭스 차원 구성을 제외하고 모두
-> 동일합니다.
-
-------------------------------------------------------------------------
-
--   양수화 : 음수와 양수로 구성된 숫자 분포의 최소값이 0이 되도록 분포를
-    0 위로 올려서 음수가 없도록 하는것입니다.
-
-> Min-Max Normalization 연산을 위해서 분포는 유지하되, 음수가 없도록
-> 하는 트릭입니다.
+> 동일합니다.  
 
 ## Colormap
 
@@ -74,7 +66,7 @@ ORTHOMOSAIC:bytes = open("input/sample_orthomosaic.tif","rb").read()
         있습니다.  
 
 ```python
-from typing import Iterable
+from typing import Iterable, Tuple
 from importlib import import_module
 
 import numpy as np
@@ -85,14 +77,14 @@ class Surface2Color:
     """DSM(digital surface model) 매트릭스를 PNG(rgba) 매트릭스로 변환합니다."""
 
     MISSING_VALUE = -10000 # z 
-    FEATURE_RANGE = 255 # 0~255 (colormap max index)
+    COLOR_MAP_IDX = 255 # 0~255 (colormap max index)
     MISSING_PIXEL = (0,0,0,0) # rgba 
-    COLOR_MAP = import_module("colormap").MATRIX 
+    COLOR_MAP = import_module("colormap").MATRIX  
 
     def __init__(self,matrix:Iterable):
         """ fit 함수를 겸합니다. """
 
-        self._n = self._calculation_n(matrix)
+        self.offset, self.n = self._calculation(matrix)
         self.data_frame = pd.DataFrame(matrix)
     
     def transform(self) -> pd.DataFrame:
@@ -109,20 +101,26 @@ class Surface2Color:
         
         if z == self.MISSING_VALUE:
             return self.MISSING_PIXEL
-        if self._min_v < 0: 
-            z += abs(self._min_v) # 양수화
-        normalized_value = z * self._n
-        return self.COLOR_MAP[round(normalized_value)]
+        
+        normalized = (z + self.offset) * self.n
+        return self.COLOR_MAP[round(normalized)]
 
-    def _calculation_n(self,matrix) -> float:
-        """ nomalization 을 위한 숫자 n을 구합니다 """
+    def _calculation(self,matrix) -> Tuple[float]:
+        """
+        Min-Max Nomalization을 위한 offset과 숫자 n을 구합니다.
+
+        offset : 분포가 0에서 시작하도록 만들어주는 숫자
+        n : 곱하면 Normalization이 되는 미지수 = (목표 범위 / 표본 최대값)
+            목표 범위는 0 ~ x 일때의 x값이다 즉, 숫자 n 은 offset 처리가 된 분포에 대해서만 유효함
+        """
 
         values = list(np.unique(np.array(matrix).flatten()))
         values.remove(self.MISSING_VALUE)
-        self._min_v , self._max_v = min(values), max(values)
-        self._pas_max_v = self._max_v + ( abs(self._min_v) if self._min_v < 0 else 0 ) # 양수화된 분포의 최대값
 
-        return self.FEATURE_RANGE / self._pas_max_v
+        offset = -min(values)
+        n = self.COLOR_MAP_IDX / (max(values) + offset)
+
+        return offset , n
 ```
 
 ## Ready  
